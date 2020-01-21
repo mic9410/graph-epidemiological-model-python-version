@@ -1,23 +1,26 @@
+from collections import Counter
+
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 
 n_nodes = 20
 n_edges = 15
-rew_prob = 0.15  # prawdopodobieństwo zarażenia
-per_infected = 0.2  # Liczba zarażonych na osobę
+rew_prob = 0.34  # prawdopodobieństwo zarażenia
+per_infected = 0.6  # Liczba zarażonych na osobę
 infection_duration = 7  # Czas trwania infekcji
-per_vaccinated = 0.3  # Liczba osób zaszczepionych
+per_vaccinated = 0.2  # Liczba osób zaszczepionych
 max_iter = 5000
 
 class Infection:
     def __init__(self, graph):
         self.graph = graph
+        self.sir = []
 
     def plot_graph(self, filename="graph"):
         nx.draw(self.graph)
         plt.tight_layout()
-        #plt.show()
+        plt.show()
         plt.savefig(filename + ".png", format="PNG")
 
     def infect(self, person_id):
@@ -44,6 +47,22 @@ class Infection:
             if self.graph.nodes[i].get("infected"):
                 num_of_sick += 1.0
         return -(1.0 - num_of_sick/len(self.graph.nodes))
+
+    def get_occurence(self):
+        total = {"0": 0, "1": 0, "2": 0}
+        for i in range(0, len(self.graph.nodes)):
+            col_nr = str(self.graph.nodes.get(i).get("color"))
+            total.update({col_nr: total.get(col_nr) + 1})
+        return total
+
+
+    def update_sir(self):
+        occurence = self.get_occurence()
+        susceptible = occurence["0"]
+        infectious = occurence["1"]
+        recovered = occurence["2"]
+        self.sir.append([susceptible, infectious, recovered])
+
 
 
 def generate_social_network(n_nodes, n_edges, rew_prob):
@@ -87,7 +106,8 @@ def is_active(infection):
     for i in infection.graph.nodes:
         if not infection.graph.nodes.get(i).get("infected"):
             env_conditions = infection.environmental_conditions_prop()
-            if infection.graph.nodes.get(i).get("exposed_to_infection") + env_conditions > 0:
+            if infection.graph.nodes.get(i).get("exposed_to_infection") + env_conditions > 0 \
+                    and not infection.graph.nodes.get(i).get("color") == 2:
                 infection.infect(i)
                 final = 1
         if infection.graph.nodes.get(i).get("infected") \
@@ -105,6 +125,7 @@ def run_simulation():
     infection_network = initialize(n_nodes, n_edges, rew_prob, per_infected)
     infection_network.plot_graph("start")
     for i in range(1, max_iter):
+        infection_network.update_sir()
         done = is_active(infection_network)
         if done == 0:
             break
