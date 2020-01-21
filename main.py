@@ -73,6 +73,13 @@ class Infection:
         plt.savefig(filename + ".png", format="PNG")
         plt.clf()
 
+    ## TODO - create plot from that - in the colomsn we have [S, I , R] values
+    def plot_sir(self):
+        sir_t = list(map(list, zip(self.sir)))
+        plt.plot(sir_t, [0.00, 1.00])
+        plt.show(block=False)
+        plt.savefig("sir.png", format="PNG")
+        plt.clf()
 
 
 def generate_social_network(n_nodes, n_edges, rew_prob):
@@ -141,5 +148,6 @@ def run_simulation():
             break
 
     infection_network.plot_graph("end")
+    infection_network.plot_sir()
 
 run_simulation()
