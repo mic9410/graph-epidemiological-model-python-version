@@ -17,12 +17,6 @@ class Infection:
         self.graph = graph
         self.sir = []
 
-    def plot_graph(self, filename="graph"):
-        nx.draw(self.graph)
-        plt.tight_layout()
-        plt.show()
-        plt.savefig(filename + ".png", format="PNG")
-
     def infect(self, person_id):
         self.graph.nodes[person_id].update({"infected": True})
         self.graph.nodes[person_id].update({"color": 1})
@@ -62,6 +56,22 @@ class Infection:
         infectious = occurence["1"]
         recovered = occurence["2"]
         self.sir.append([susceptible, infectious, recovered])
+
+    def plot_graph(self, filename="graph"):
+        color_map = []
+        for i in self.graph.nodes:
+            if self.graph.nodes.get(i).get("color") == 0:
+                color_map.append('limegreen')
+            elif self.graph.nodes.get(i).get("color") == 1:
+                color_map.append('darkred')
+            else:
+                color_map.append('steelblue')
+
+        nx.draw(self.graph, node_color=color_map, with_labels=True)
+        plt.tight_layout()
+        plt.show(block=False)
+        plt.savefig(filename + ".png", format="PNG")
+        plt.clf()
 
 
 
