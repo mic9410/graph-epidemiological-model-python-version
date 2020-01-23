@@ -73,12 +73,21 @@ class Infection:
         plt.savefig(filename + ".png", format="PNG")
         plt.clf()
 
-    ## TODO - create plot from that - in the colomsn we have [S, I , R] values
     def plot_sir(self):
         sir_t = list(map(list, zip(self.sir)))
-        plt.plot(sir_t, [0.00, 1.00])
-        plt.show(block=False)
-        plt.savefig("sir.png", format="PNG")
+        S=[]
+        I=[]
+        R=[]
+        for i in range(len(sir_t)):
+            S.append(sir_t[i][0][0])
+            I.append(sir_t[i][0][1])
+            R.append(sir_t[i][0][2])
+        plt.plot(S)
+        plt.plot(I)
+        plt.plot(R)  
+        plt.legend("SIR")
+        
+        plt.savefig("sirr.png", format="PNG")
         plt.clf()
 
 
